@@ -6,6 +6,57 @@ import time
 import network
 import json
 import asyncio
+import math
+# --- RGB LED Pin Configuration ---
+# Common cathode RGB LED: GP2=Red, GP3=Green, GP4=Blue (each via 100 ohm resistor)
+red_pwm = machine.PWM(machine.Pin(2))
+green_pwm = machine.PWM(machine.Pin(3))
+blue_pwm = machine.PWM(machine.Pin(4))
+
+# Set PWM frequency (Hz)
+for pwm in (red_pwm, green_pwm, blue_pwm):
+    pwm.freq(1000)
+# --- Core Functions ---
+
+# --- HSV to RGB conversion (0-1 floats in, 0-255 ints out) ---
+def hsv_to_rgb(h, s, v):
+    h = float(h)
+    s = float(s)
+    v = float(v)
+    hi = int(h / 60) % 6
+    f = (h / 60) - math.floor(h / 60)
+    p = v * (1 - s)
+    q = v * (1 - f * s)
+    t = v * (1 - (1 - f) * s)
+    if hi == 0:
+        r, g, b = v, t, p
+    elif hi == 1:
+        r, g, b = q, v, p
+    elif hi == 2:
+        r, g, b = p, v, t
+    elif hi == 3:
+        r, g, b = p, q, v
+    elif hi == 4:
+        r, g, b = t, p, v
+    else:
+        r, g, b = v, p, q
+    return int(r * 255), int(g * 255), int(b * 255)
+
+# --- Set RGB LED color (0-255 per channel) ---
+def set_rgb(r, g, b):
+    # Invert for common cathode: 0=off, 255=full brightness
+    red_pwm.duty_u16(65535 - int(r * 257))
+    green_pwm.duty_u16(65535 - int(g * 257))
+    blue_pwm.duty_u16(65535 - int(b * 257))
+
+# --- Coroutine to smoothly cycle LED through color spectrum ---
+async def rgb_color_cycle(delay_ms=20):
+    hue = 0
+    while True:
+        r, g, b = hsv_to_rgb(hue, 1, 1)
+        set_rgb(r, g, b)
+        hue = (hue + 1) % 360
+        await asyncio.sleep_ms(delay_ms)
 
 # --- Pin Configuration ---
 # The photosensor is connected to an Analog-to-Digital Converter (ADC) pin.
@@ -196,7 +247,11 @@ async def main():
     # WiFi and web server disabled - running in standalone default mode
     print("Starting Pico Light Orchestra in default mode...")
     print("Use light sensor to control musical tones!")
-    
+    print("RGB LED will smoothly transition through the color spectrum.")
+
+    # Start the RGB color cycle as a background task
+    rgb_task = asyncio.create_task(rgb_color_cycle())
+
     # This loop runs the "default" behavior: playing sound based on light
     while True:
         # Read the sensor. Values range from ~500 (dark) to ~65535 (bright)
