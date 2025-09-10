@@ -14,7 +14,8 @@ photo_sensor_pin = machine.ADC(26)
 
 # The buzzer is connected to a GPIO pin that supports Pulse Width Modulation (PWM).
 # PWM allows us to create a square wave at a specific frequency to make a sound.
-buzzer_pin = machine.PWM(machine.Pin(18))
+buzzer_pin = machine.PWM(machine.Pin(10))
+buzzer_pin2 = machine.PWM(machine.Pin(13))
 
 # --- Global State ---
 # This variable will hold the task that plays a note from an API call.
@@ -64,7 +65,9 @@ def play_tone(frequency: int, duration_ms: int) -> None:
     """Plays a tone on the buzzer for a given duration."""
     if frequency > 0:
         buzzer_pin.freq(int(frequency))
+        buzzer_pin2.freq(int(frequency))
         buzzer_pin.duty_u16(32768)  # 50% duty cycle
+        buzzer_pin2.duty_u16(32768)  # 50% duty cycle
         time.sleep_ms(duration_ms)  # type: ignore[attr-defined]
         stop_tone()
     else:
@@ -74,6 +77,7 @@ def play_tone(frequency: int, duration_ms: int) -> None:
 def stop_tone():
     """Stops any sound from playing."""
     buzzer_pin.duty_u16(0)  # 0% duty cycle means silence
+    buzzer_pin2.duty_u16(0)  # 0% duty cycle means silence
 
 
 async def play_api_note(frequency, duration_s):
@@ -81,7 +85,9 @@ async def play_api_note(frequency, duration_s):
     try:
         print(f"API playing note: {frequency}Hz for {duration_s}s")
         buzzer_pin.freq(int(frequency))
+        buzzer_pin2.freq(int(frequency))
         buzzer_pin.duty_u16(32768)  # 50% duty cycle
+        buzzer_pin2.duty_u16(32768)  # 50% duty cycle
         await asyncio.sleep(duration_s)
         stop_tone()
         print("API note finished.")
@@ -187,39 +193,35 @@ async def handle_request(reader, writer):
 
 async def main():
     """Main execution loop."""
-    try:
-        ip = connect_to_wifi()
-        print(f"Starting web server on {ip}...")
-        asyncio.create_task(asyncio.start_server(handle_request, "0.0.0.0", 80))
-    except Exception as e:
-        print(f"Failed to initialize: {e}")
-        return
-
+    # WiFi and web server disabled - running in standalone default mode
+    print("Starting Pico Light Orchestra in default mode...")
+    print("Use light sensor to control musical tones!")
+    
     # This loop runs the "default" behavior: playing sound based on light
     while True:
-        # Only run this loop if no API note is currently scheduled to play
-        if api_note_task is None or api_note_task.done():
-            # Read the sensor. Values range from ~500 (dark) to ~65535 (bright)
-            light_value = photo_sensor_pin.read_u16()
+        # Read the sensor. Values range from ~500 (dark) to ~65535 (bright)
+        light_value = photo_sensor_pin.read_u16()
 
-            # Map the light value to a frequency range (e.g., C4 to C6)
-            # Adjust the input range based on your room's lighting
-            min_light = 1000
-            max_light = 65000
-            min_freq = 261  # C4
-            max_freq = 1046  # C6
+        # Map the light value to a frequency range (e.g., C4 to C6)
+        # Adjust the input range based on your room's lighting
+        min_light = 1000
+        max_light = 65000
+        min_freq = 261  # C4
+        max_freq = 1046  # C6
 
-            # Clamp the light value to the expected range
-            clamped_light = max(min_light, min(light_value, max_light))
+        # Clamp the light value to the expected range
+        clamped_light = max(min_light, min(light_value, max_light))
 
-            if clamped_light > min_light:
-                frequency = map_value(
-                    clamped_light, min_light, max_light, min_freq, max_freq
-                )
-                buzzer_pin.freq(frequency)
-                buzzer_pin.duty_u16(32768)  # 50% duty cycle
-            else:
-                stop_tone()  # If it's very dark, be quiet
+        if clamped_light > min_light:
+            frequency = map_value(
+                clamped_light, min_light, max_light, min_freq, max_freq
+            )
+            buzzer_pin.freq(frequency)
+            buzzer_pin2.freq(frequency)
+            buzzer_pin.duty_u16(32768)  # 50% duty cycle
+            buzzer_pin2.duty_u16(32768)  # 50% duty cycle
+        else:
+            stop_tone()  # If it's very dark, be quiet
 
         await asyncio.sleep_ms(50)  # type: ignore[attr-defined]
 
