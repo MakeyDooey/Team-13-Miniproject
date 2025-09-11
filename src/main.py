@@ -49,13 +49,14 @@ def set_rgb(r, g, b):
     green_pwm.duty_u16(65535 - int(g * 257))
     blue_pwm.duty_u16(65535 - int(b * 257))
 
-# --- Coroutine to smoothly cycle LED through color spectrum ---
-async def rgb_color_cycle(delay_ms=20):
-    hue = 0
+# --- Coroutine to max out each LED pin one at a time ---
+async def rgb_one_at_a_time(delay_ms=500):
     while True:
-        r, g, b = hsv_to_rgb(hue, 1, 1)
-        set_rgb(r, g, b)
-        hue = (hue + 1) % 360
+        set_rgb(255, 0, 0)  # Red on
+        await asyncio.sleep_ms(delay_ms)
+        set_rgb(0, 255, 0)  # Green on
+        await asyncio.sleep_ms(delay_ms)
+        set_rgb(0, 0, 255)  # Blue on
         await asyncio.sleep_ms(delay_ms)
 
 # --- Pin Configuration ---
@@ -249,8 +250,8 @@ async def main():
     print("Use light sensor to control musical tones!")
     print("RGB LED will smoothly transition through the color spectrum.")
 
-    # Start the RGB color cycle as a background task
-    rgb_task = asyncio.create_task(rgb_color_cycle())
+    # Start the RGB one-at-a-time cycle as a background task
+    rgb_task = asyncio.create_task(rgb_one_at_a_time())
 
     # This loop runs the "default" behavior: playing sound based on light
     while True:
