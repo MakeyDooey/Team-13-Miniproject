@@ -249,6 +249,28 @@ async def main():
         print(f"Web server running at http://{ip}/")
         server = await asyncio.start_server(handle_request, "0.0.0.0", 80)
         print("Web server started. Waiting for connections...")
+        # Start a background task for buzzer/light logic
+        async def light_to_buzzer():
+            min_light = 1000
+            max_light = 65000
+            min_freq = 261  # C4
+            max_freq = 1046  # C6
+            while True:
+                light_value = photo_sensor_pin.read_u16()
+                clamped_light = max(min_light, min(light_value, max_light))
+                if clamped_light > min_light:
+                    frequency = map_value(
+                        clamped_light, min_light, max_light, min_freq, max_freq
+                    )
+                    buzzer_pin.freq(frequency)
+                    buzzer_pin2.freq(frequency)
+                    buzzer_pin.duty_u16(32768)
+                    buzzer_pin2.duty_u16(32768)
+                else:
+                    stop_tone()
+                await asyncio.sleep_ms(50)
+        # Start the background task
+        asyncio.create_task(light_to_buzzer())
         while True:
             await asyncio.sleep(1)  # Keeps the event loop running
     except Exception as e:
