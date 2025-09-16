@@ -4,7 +4,7 @@
 unit_tests.py
 --------------
 
-Lightweight unit test suite for the Pico Orchestra project.
+Lightweight unit test suite for the Pico project.
 
 This script provides a minimal test runner and a collection of tests for
 core functions in `main.py`. It mocks hardware-specific components 
