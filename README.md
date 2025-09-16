@@ -6,17 +6,26 @@ The purpose of this repository is to practice an agile workflow via the creation
 **Project Members:** @LeoMattosMartins, @DomMurphy-git, @Jonny-Wu13, @KoenLin, @vik802, BenjaminJoseph123
 
 ## Project Concept
-Our project aims to be a color-detecting device to help those visually impaired with daily tasks such as picking out clothes and identifying different household objects. This will be accomplished with the use of a photoresistor, an RGB LED, a buzzer, and a Pico 2W with MicroPython running a web server that can be accessed externally.
+Our project aims to be a color-detecting device to help those visually impaired with daily tasks such as picking out clothes and identifying different household objects. This is accomplished with the use of a photoresistor, an RGB LED, a buzzer, and a Pico 2W with MicroPython running a web server that can be accessed externally using a WiFi AP hosted by the Pico. An LED shined the desired color at the object. A photoresistor then detects the amount of your desired color's light reflected off of an object. This information is used to determine if the object is that color or not and informs the user if yes (high-pitch buzzer beep) or no (low-pitch buzzer beep). 
 
 ## Demo 
 
-### Diagrams
+### Diagram
+
+<img width="472" height="551" alt="Diagram" src="https://github.com/user-attachments/assets/e58e3676-d282-4d54-8c3c-5f9129551fe0"/>
 
 ### Photos
 
-### Video
+<img width="200" height="551" alt="Photo 1" src="https://github.com/user-attachments/assets/686c4cf1-4553-4f10-9137-38515c45acda"/>
+<img width="356" height="551" alt="Photo 2" src="https://github.com/user-attachments/assets/fb201563-b52f-4d0f-8001-0de6aca18197"/>
+<img width="356" height="551" alt="Photo 3" src="https://github.com/user-attachments/assets/02e59080-5c94-4e9d-84e6-d21cca5c01c2"/>
 
-## Find out more
+### Video
+The video exploring full functionality is too large to be uploaded here, please find a link to it attached [here](https://drive.google.com/file/d/1kSi6E3jve1HeU7vGaM1t75incd2CugN6/view?usp=drive_link)
+## Testing Instructions
+
+We've used the same hardware set up as the example, instructions for that can be found here:
+
 <details>
 <summary>Original Project Specs</summary>
 # 2025 Fall ECE Senior Design Miniproject
@@ -92,3 +101,5 @@ Duty cycle greater than 1 is undefined, so we clip the duty cycle to the range [
 * [Pico 2WH pinout diagram](https://datasheets.raspberrypi.com/picow/pico-2-w-pinout.pdf) shows the connections to analog and digital IO.
 * Getting Started with Pi Pico [book](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf)
 </details>
+
+All other testing information can be found inside the (testing)[./testing] folder

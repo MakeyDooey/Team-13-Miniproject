@@ -1,5 +1,21 @@
-# unit_tests.py
-# Lightweight unit tests for Pico Orchestra project
+# AI DISCLAIMER: GPT-5 was used to write documentation, all code was written by people 
+
+"""
+unit_tests.py
+--------------
+
+Lightweight unit test suite for the Pico project.
+
+This script provides a minimal test runner and a collection of tests for
+core functions in `main.py`. It mocks hardware-specific components 
+(e.g., PWM, ADC, and Pin) so the logic can be tested without requiring
+a Raspberry Pi Pico. Functions tested include color conversion, RGB 
+control, tone playback, API note playback, value mapping, and request 
+logging.
+
+The script tracks test results, printing a summary of passed and failed
+tests when executed directly.
+"""
 
 import math
 import ujson as json

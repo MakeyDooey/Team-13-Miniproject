@@ -1,6 +1,6 @@
+# AI DISCLAIMER: GPT-5 was used to write documentation, all code was written by people 
 
 # main.py for Raspberry Pi Pico W
-# Title: Pico Light Orchestra Instrument Code
 
 import machine
 import time
@@ -18,30 +18,6 @@ blue_pwm = machine.PWM(machine.Pin(15))
 for pwm in (red_pwm, green_pwm, blue_pwm):
     pwm.freq(1000)
 # --- Core Functions ---
-
-# --- HSV to RGB conversion (0-1 floats in, 0-255 ints out) ---
-def hsv_to_rgb(h, s, v):
-    h = float(h)
-    s = float(s)
-    v = float(v)
-    hi = int(h / 60) % 6
-    f = (h / 60) - math.floor(h / 60)
-    p = v * (1 - s)
-    q = v * (1 - f * s)
-    t = v * (1 - (1 - f) * s)
-    if hi == 0:
-        r, g, b = v, t, p
-    elif hi == 1:
-        r, g, b = q, v, p
-    elif hi == 2:
-        r, g, b = p, v, t
-    elif hi == 3:
-        r, g, b = p, q, v
-    elif hi == 4:
-        r, g, b = t, p, v
-    else:
-        r, g, b = v, p, q
-    return int(r * 255), int(g * 255), int(b * 255)
 
 # --- Set RGB LED color (0-255 per channel) ---
 def set_rgb(r, g, b):
@@ -76,8 +52,6 @@ buzzer_pin2 = machine.PWM(machine.Pin(13))
 api_note_task = None
 
 # --- Core Functions ---
-
-
 def connect_to_wifi(wifi_config: str = "wifi_config.json"):
     """Sets up the Pico W as a WiFi Access Point (AP mode)."""
     ap_ssid = "Pico-Orchestra"
