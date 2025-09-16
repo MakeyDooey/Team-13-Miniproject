@@ -1,3 +1,23 @@
+# AI DISCLAIMER: GPT-5 was used to write documentation, all code was written by people 
+
+"""
+integration_test.py
+-------------------
+
+Asynchronous integration test suite for the Pico project.
+
+This script launches the web server from `server.py` and interacts with
+its endpoints over HTTP to verify end-to-end functionality. It simulates
+real client behavior using GET and POST requests, then checks both the
+HTTP responses and the persistence of log data.
+
+Tests include:
+- GET `/` to confirm the server is running and returning a valid page.
+- GET `/set_color` to verify color-setting functionality.
+- POST `/play_note` to confirm note playback handling.
+- Validation that `logs.db` is updated with request entries.
+"""
+
 import uasyncio as asyncio
 import ujson as json
 import os
