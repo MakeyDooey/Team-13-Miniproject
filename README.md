@@ -1,3 +1,13 @@
+# Team-13-Miniproject
+*this is a fork from [03-Miniproject](https://github.com/BU-ECE-Senior-Design/03-Miniproject) from BU-ECE-Senior-Design, please access the link provided for further details*
+
+The purpose of this repository is to practice an agile workflow via the creation of a week-long miniproject. This repository and all of it contents is an assignment for EC 463 at Boston University
+
+**Project Members:** @LeoMattosMartins, @DomMurphy-git, @Jonny-Wu13, @KoenLin, @vik802, BenjaminJoseph123
+
+## Project Concept
+Our project aims to be a color-detecting device to help those visually impaired with daily tasks such as picking out clothes and identifying different household objects. This will be accomplished with the use of a photoresistor, an RGB LED, a buzzer, and a Pico 2W with MicroPython running a web server that can be accessed externally.
+
 # 2025 Fall ECE Senior Design Miniproject
 
 [Project definition](./Project.md)
