@@ -1,0 +1,3 @@
+{"timestamp": 1726500000, "method": "GET", "url": "/", "light_value": 42000}
+{"timestamp": 1726500005, "method": "GET", "url": "/set_color?color=red", "light_value": 41890}
+{"timestamp": 1726500010, "method": "POST", "url": "/play_note", "light_value": 41950}
