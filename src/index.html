@@ -34,7 +34,7 @@
     button {
       width: 200px;
       height: 140px;
-      font-size: 40px;
+      font-size: 39px;
       font-weight: bold;
       border: none;
       border-radius: 10px;
@@ -51,17 +51,17 @@
 
 
     .red {
-      background-color: #e74c3c;
+      background-color: #e81a03;
     }
 
 
     .green {
-      background-color: #27ae60;
+      background-color: #00ff6a;
     }
 
 
     .blue {
-      background-color: #3498db;
+      background-color: #001aff;
     }
 
 
@@ -84,7 +84,6 @@
       fetch('http://192.168.4.1/set_color?color=' + color)
         .then(response => response.json())
         .then(data => console.log(data))
-        .catch(error => console.error('Error:', error));
     }
   </script>
 </body>
