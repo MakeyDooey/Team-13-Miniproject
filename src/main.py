@@ -169,9 +169,9 @@ async def handle_request(reader, writer):
         if color == "red":
             set_rgb(255, 0, 0)
         elif color == "green":
-            set_rgb(0, 255, 0)
-        elif color == "blue":
             set_rgb(0, 0, 255)
+        elif color == "blue":
+            set_rgb(0, 255, 0)
         else:
             set_rgb(0, 0, 0)
         response = f'{{"status": "ok", "color": "{color}"}}'
@@ -248,8 +248,9 @@ async def main():
         ip = connect_to_wifi()
         print(f"Web server running at http://{ip}/")
         server = await asyncio.start_server(handle_request, "0.0.0.0", 80)
-        async with server:
-            await server.serve_forever()
+        print("Web server started. Waiting for connections...")
+        while True:
+            await asyncio.sleep(1)  # Keeps the event loop running
     except Exception as e:
         print(f"WiFi/web server failed: {e}\nRunning in default mode.")
         # Fallback: run default behavior

@@ -1,0 +1,16 @@
+<html>
+  <body>
+    <h1>Welcome to Pico W AP!</h1>
+    <button onclick="setColor('red')">Red</button>
+    <button onclick="setColor('green')">Green</button>
+    <button onclick="setColor('blue')">Blue</button>
+    <button onclick="setColor('off')">Off</button>
+    <script>
+      function setColor(color) {
+        fetch('http://192.168.4.1/set_color?color=' + color)
+          .then(response => response.json())
+          .then(data => console.log(data));
+      }
+    </script>
+  </body>
+</html>
