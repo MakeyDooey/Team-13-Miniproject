@@ -1,6 +1,6 @@
 # main.py for Raspberry Pi Pico W
 # Title: Pico Light Orchestra Instrument Code
-#Yay ViksBranch
+#Hurray Branch of Vik
 
 import machine
 import time
