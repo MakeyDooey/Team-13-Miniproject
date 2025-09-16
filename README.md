@@ -1,17 +1,28 @@
 # Team-13-Miniproject
 *this is a fork from [03-Miniproject](https://github.com/BU-ECE-Senior-Design/03-Miniproject) from BU-ECE-Senior-Design, please access the link provided for further details*
 
-The purpose of this repository is to practice an agile workflow via the creation of a week-long miniproject. This repository and all of it contents is an assignment for EC 463 at Boston University
+The purpose of this repository is to practice an agile workflow via the creation of a week-long miniproject. This repository and all of it contents is an assignment for EC 463 at Boston University. All work done by our team members can be found under the [testing](./testing) and [src2](./src2) directories, and this README.
 
 **Project Members:** @LeoMattosMartins, @DomMurphy-git, @Jonny-Wu13, @KoenLin, @vik802, BenjaminJoseph123
 
 ## Project Concept
 Our project aims to be a color-detecting device to help those visually impaired with daily tasks such as picking out clothes and identifying different household objects. This will be accomplished with the use of a photoresistor, an RGB LED, a buzzer, and a Pico 2W with MicroPython running a web server that can be accessed externally.
 
+## Demo 
+
+### Diagrams
+
+### Photos
+
+### Video
+
+## Find out more
+<details>
+<summary>Original Project Specs</summary>
 # 2025 Fall ECE Senior Design Miniproject
 
 [Project definition](./Project.md)
-
+ 
 This project uses the Raspberry Pi Pico 2WH SC1634 (wireless, with header pins).
 
 Each team must provide a micro-USB cable that connects to their laptop to plug into the Pi Pico.
@@ -65,20 +76,19 @@ In a more complete project, we would use additional resistors and capacitors wit
 The sound output is quiet but usable for this exercise.
 
 Musical notes correspond to particular base frequencies and typically have rich harmonics in typical musical instruments.
-An example soundboard showing note frequencies is [clickable](https://muted.io/note-frequencies/).
+>An example soundboard showing note frequencies is [clickable](https://muted.io/note-frequencies/).
 Over human history, the corresspondance of notes to frequencies has changed over time and location and musical cultures.
 For the question below, feel free to use musical scale of your choice!
 
 [Music Examples](https://github.com/twisst/Music-for-Raspberry-Pi-Pico/blob/main/play.py)
-
 
 ## Notes
 
 Pico MicroPython time.sleep() doesn't error for negative values even though such are obviously incorrect--it is undefined for a system to sleep for negative time.
 Duty cycle greater than 1 is undefined, so we clip the duty cycle to the range [0, 1].
 
-
 ## Reference
 
 * [Pico 2WH pinout diagram](https://datasheets.raspberrypi.com/picow/pico-2-w-pinout.pdf) shows the connections to analog and digital IO.
 * Getting Started with Pi Pico [book](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf)
+</details>
