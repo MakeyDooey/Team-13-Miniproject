@@ -11,7 +11,7 @@ import math
 # Common cathode RGB LED: GP2=Red, GP3=Green, GP4=Blue (each via 100 ohm resistor)
 red_pwm = machine.PWM(machine.Pin(2))
 green_pwm = machine.PWM(machine.Pin(3))
-blue_pwm = machine.PWM(machine.Pin(4))
+blue_pwm = machine.PWM(machine.Pin(15))
 
 # Set PWM frequency (Hz)
 for pwm in (red_pwm, green_pwm, blue_pwm):
@@ -78,38 +78,18 @@ api_note_task = None
 
 
 def connect_to_wifi(wifi_config: str = "wifi_config.json"):
-    """Connects the Pico W to the specified Wi-Fi network.
-
-    This expects a JSON text file 'wifi_config.json' with 'ssid' and 'password' keys,
-    which would look like
-    {
-        "ssid": "your_wifi_ssid",
-        "password": "your_wifi_password"
-    }
-    """
-
-    with open(wifi_config, "r") as f:
-        data = json.load(f)
-
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.connect(data["ssid"], data["password"])
-
-    # Wait for connection or fail
-    max_wait = 10
-    print("Connecting to Wi-Fi...")
-    while max_wait > 0:
-        if wlan.status() < 0 or wlan.status() >= 3:
-            break
-        max_wait -= 1
+    """Sets up the Pico W as a WiFi Access Point (AP mode)."""
+    ap_ssid = "Pico-Orchestra"
+    ap_password = "picopassword"  # Minimum 8 characters
+    ap = network.WLAN(network.AP_IF)
+    ap.active(True)
+    ap.config(essid=ap_ssid, password=ap_password)
+    print(f"Access Point started! SSID: {ap_ssid}, Password: {ap_password}")
+    # Wait for AP to be active
+    while not ap.active():
         time.sleep(1)
-
-    if wlan.status() != 3:
-        raise RuntimeError("Network connection failed")
-    else:
-        status = wlan.ifconfig()
-        ip_address = status[0]
-        print(f"Connected! Pico IP Address: {ip_address}")
+    ip_address = ap.ifconfig()[0]
+    print(f"Pico AP IP Address: {ip_address}")
     return ip_address
 
 
@@ -181,12 +161,30 @@ async def handle_request(reader, writer):
     content_type = "text/html"
 
     # --- API Endpoint Routing ---
-    if method == "GET" and url == "/":
+    if method == "GET" and url.startswith("/set_color"):
+        # Parse color from query string
+        import ure
+        match = ure.search(r"color=([a-zA-Z]+)", url)
+        color = match.group(1).lower() if match else ""
+        if color == "red":
+            set_rgb(255, 0, 0)
+        elif color == "green":
+            set_rgb(0, 255, 0)
+        elif color == "blue":
+            set_rgb(0, 0, 255)
+        else:
+            set_rgb(0, 0, 0)
+        response = f'{{"status": "ok", "color": "{color}"}}'
+        content_type = "application/json"
+    elif method == "GET" and url == "/":
         html = f"""
         <html>
             <body>
                 <h1>Pico Light Orchestra</h1>
                 <p>Current light sensor reading: {light_value}</p>
+                <button onclick=\"fetch('/set_color?color=red')\">Red</button>
+                <button onclick=\"fetch('/set_color?color=green')\">Green</button>
+                <button onclick=\"fetch('/set_color?color=blue')\">Blue</button>
             </body>
         </html>
         """
@@ -245,41 +243,37 @@ async def handle_request(reader, writer):
 
 async def main():
     """Main execution loop."""
-    # WiFi and web server disabled - running in standalone default mode
-    print("Starting Pico Light Orchestra in default mode...")
-    print("Use light sensor to control musical tones!")
-    print("RGB LED will smoothly transition through the color spectrum.")
-
-    # Start the RGB one-at-a-time cycle as a background task
-    rgb_task = asyncio.create_task(rgb_one_at_a_time())
-
-    # This loop runs the "default" behavior: playing sound based on light
-    while True:
-        # Read the sensor. Values range from ~500 (dark) to ~65535 (bright)
-        light_value = photo_sensor_pin.read_u16()
-
-        # Map the light value to a frequency range (e.g., C4 to C6)
-        # Adjust the input range based on your room's lighting
-        min_light = 1000
-        max_light = 65000
-        min_freq = 261  # C4
-        max_freq = 1046  # C6
-
-        # Clamp the light value to the expected range
-        clamped_light = max(min_light, min(light_value, max_light))
-
-        if clamped_light > min_light:
-            frequency = map_value(
-                clamped_light, min_light, max_light, min_freq, max_freq
-            )
-            buzzer_pin.freq(frequency)
-            buzzer_pin2.freq(frequency)
-            buzzer_pin.duty_u16(32768)  # 50% duty cycle
-            buzzer_pin2.duty_u16(32768)  # 50% duty cycle
-        else:
-            stop_tone()  # If it's very dark, be quiet
-
-        await asyncio.sleep_ms(50)  # type: ignore[attr-defined]
+    # Try to connect to WiFi and start web server if successful
+    try:
+        ip = connect_to_wifi()
+        print(f"Web server running at http://{ip}/")
+        server = await asyncio.start_server(handle_request, "0.0.0.0", 80)
+        async with server:
+            await server.serve_forever()
+    except Exception as e:
+        print(f"WiFi/web server failed: {e}\nRunning in default mode.")
+        # Fallback: run default behavior
+        print("Use light sensor to control musical tones!")
+        print("RGB LED will smoothly transition through the color spectrum.")
+        rgb_task = asyncio.create_task(rgb_one_at_a_time())
+        while True:
+            light_value = photo_sensor_pin.read_u16()
+            min_light = 1000
+            max_light = 65000
+            min_freq = 261  # C4
+            max_freq = 1046  # C6
+            clamped_light = max(min_light, min(light_value, max_light))
+            if clamped_light > min_light:
+                frequency = map_value(
+                    clamped_light, min_light, max_light, min_freq, max_freq
+                )
+                buzzer_pin.freq(frequency)
+                buzzer_pin2.freq(frequency)
+                buzzer_pin.duty_u16(32768)
+                buzzer_pin2.duty_u16(32768)
+            else:
+                stop_tone()
+            await asyncio.sleep_ms(50)
 
 
 # Run the main event loop
