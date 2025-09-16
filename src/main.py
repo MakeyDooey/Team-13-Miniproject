@@ -222,6 +222,58 @@ async def handle_request(reader, writer):
     await writer.wait_closed()
     print("Client disconnected")
 
+async def serve_client(reader, writer):
+    request_line = await reader.readline()
+    if not request_line:
+        await writer.aclose()
+        return
+
+    # Read and discard HTTP headers
+    while True:
+        header = await reader.readline()
+        if header == b'\r\n' or header == b'':
+            break
+
+    request = request_line.decode()
+    print("Request:", request.strip())
+
+    if "GET / " in request:
+        response = """\
+HTTP/1.0 200 OK
+
+<html>
+  <body>
+    <h1>Welcome to Pico W AP!</h1>
+    <button onclick="fetch('/led?color=red')">Red</button>
+    <button onclick="fetch('/led?color=green')">Green</button>
+    <button onclick="fetch('/led?color=blue')">Blue</button>
+    <button onclick="fetch('/led?color=off')">Off</button>
+  </body>
+</html>
+"""
+    elif "GET /led?" in request:
+        # Parse color from URL
+        color_start = request.find("color=") + 6
+        color_end = request.find(" ", color_start)
+        color = request[color_start:color_end]
+
+        print(f"Setting LED color to: {color}")
+        if color == "red":
+            set_rgb(255, 0, 0)
+        elif color == "green":
+            set_rgb(0, 255, 0)
+        elif color == "blue":
+            set_rgb(0, 0, 255)
+        else:
+            set_rgb(0, 0, 0)  # Off
+
+        response = "HTTP/1.0 200 OK\r\nContent-Type: text/plain\r\n\r\nOK"
+    else:
+        response = "HTTP/1.0 404 Not Found\r\n\r\nPage not found."
+
+    await writer.awrite(response)
+    await writer.aclose()
+
 
 async def main():
     """Main execution loop."""
@@ -232,9 +284,10 @@ async def main():
 
     
     ip_address = start_wifi_ap()
-    server = await asyncio.start_server(handle_request, "0.0.0.0", 80)
     print("HTTP server running. Connect to http://" + ip_address)
-    
+    server = await asyncio.start_server(serve_client, "0.0.0.0", 80)
+    await server.wait_closed()
+
     # Start the RGB one-at-a-time cycle as a background task
     rgb_task = asyncio.create_task(rgb_one_at_a_time())
 
