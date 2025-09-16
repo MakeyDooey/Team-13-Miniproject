@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pico W LED Control</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+
+    h1 {
+      color: #333;
+      margin-bottom: 50px;
+      text-align: center;
+    }
+
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 160px);
+      grid-gap: 45px;
+    }
+
+
+    button {
+      width: 200px;
+      height: 140px;
+      font-size: 40px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, opacity 0.3s;
+      color: white;
+    }
+
+
+    button:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+
+
+    .red {
+      background-color: #e74c3c;
+    }
+
+
+    .green {
+      background-color: #27ae60;
+    }
+
+
+    .blue {
+      background-color: #3498db;
+    }
+
+
+    .off {
+      background-color: #7f8c8d;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Pico W AP!</h1>
+  <div class="button-grid">
+    <button class="red" onclick="fetch('/led?color=red')">Red</button>
+    <button class="green" onclick="fetch('/led?color=green')">Green</button>
+    <button class="blue" onclick="fetch('/led?color=blue')">Blue</button>
+    <button class="off" onclick="fetch('/led?color=off')">Off</button>
+  </div>
+
+  <script>
+    function setColor(color) {
+      fetch('http://192.168.4.1/set_color?color=' + color)
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>
